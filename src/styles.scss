@@ -1,0 +1,13 @@
+/* You can add global styles to this file, and also import other style files */
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+html, body {
+    margin: 0;
+    height: 100%;
+
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+.mat-list-item-content {
+    width: 100% !important;
+}
