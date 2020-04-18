@@ -2,39 +2,48 @@
 <section>
   <div class="filter-close mat-elevation-z6" *ngIf="!toggleFilterDisplay">
   <div class="close-btn mat-elevation-z7">
-    <button mat-icon-button (click)="toggleFilterPanel()"><<</button>
+    <button mat-icon-button (click)="toggleFilterPanel()"><i class="arrow down"></i></button>
   </div>
   </div>
 
   <div class="filters mat-elevation-z6 " [ngClass]= "(toggleFilterDisplay ? 'show-filter' : 'hide-filter')" >
     
     <div class="toggle-open-btn mat-elevation-z7">
-      <button mat-icon-button (click)="toggleFilterPanel()">>></button>
+      <button mat-icon-button (click)="toggleFilterPanel()"><i class="arrow up"></i></button>
     </div>
     
     <form [formGroup]="filterForm">
 
       <mat-form-field>
-        <input matInput placeholder="By" formControlName="saidBy" [matAutocomplete]="by">
+        <input matInput placeholder="By" formControlName="author" [matAutocomplete]="by">
 
         <mat-autocomplete #by="matAutocomplete">
-          <mat-option *ngFor="let saidBy of filteredSaidByOptions | async" [value]="saidBy">
-            {{saidBy}}
+          <mat-option *ngFor="let author of filteredAuthorOptions | async" [value]="author">
+            {{author}}
           </mat-option>
         </mat-autocomplete>
+
+        <button mat-button *ngIf="filterForm?.get('author').value" matSuffix mat-icon-button aria-label="Clear" (click)="clearFilterOf('author')">
+          <span style='font-size:16px;'>&#10006;</span>
+        </button>
       </mat-form-field>
 
       <mat-form-field>
-        <input matInput placeholder="Category" formControlName="category" [matAutocomplete]="category">
+        <input matInput placeholder="Tags" formControlName="tags" [matAutocomplete]="tags">
 
-        <mat-autocomplete #category="matAutocomplete">
-          <mat-option *ngFor="let category of filteredCategoryOptions | async" [value]="category">
-            {{category}}
+        <mat-autocomplete #tags="matAutocomplete">
+          <mat-option *ngFor="let tags of filteredTagsOptions | async" [value]="tags">
+            {{tags}}
           </mat-option>
         </mat-autocomplete>
+
+        <button mat-button *ngIf="filterForm?.get('tags').value" matSuffix mat-icon-button aria-label="Clear" (click)="clearFilterOf('tags')">
+          <span style='font-size:16px;'>&#10006;</span>
+        </button>
       </mat-form-field>
 
-      <button  mat-raised-button color="warn" [disabled]="!(filterForm.get('category').value || filterForm.get('saidBy').value)" (click)="applyFilter()">Apply Filter</button>
+      <button  mat-raised-button color="warn" [disabled]="disableApplyBtn" (click)="applyFilter()">Apply Filter</button>
+      <button  mat-raised-button color="basic" [disabled]="disableClearBtn" (click)="clearFilter()">Clear Filter</button>
 
     </form>
 
@@ -48,9 +57,9 @@
             <div>  <q>{{quote.quote}}</q>  </div>
             <div class="quote-meta">
               <div class="meta">
-                <div  class="tags" *ngFor="let tags of quote?.category">{{tags}}</div>
+                <div  class="tags" *ngFor="let tags of quote?.tags">{{tags}}</div>
               </div>
-               <strong>~ {{quote.saidBy}}</strong> 
+               <strong>~ {{quote.author}}</strong> 
               </div>
           </div>
         </mat-list-item>

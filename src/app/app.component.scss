@@ -67,6 +67,8 @@ section {
             flex-direction: column;
             width: 100%;
 
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+
             .quote-meta {
                 padding-top: 4px;
                 display: flex;
@@ -133,7 +135,7 @@ section {
 
         .close-btn {
             position: absolute;
-            bottom: -42px;
+            bottom: -24px;
             border-radius: 50%;
             background-color: white;
             left: calc(50% - 24px);
@@ -154,3 +156,23 @@ section {
         display: none;
     }
 }
+
+
+
+i {
+    border: solid black;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+  }
+
+  
+  .up {
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+  }
+  
+  .down {
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+  }

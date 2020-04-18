@@ -8,8 +8,7 @@ import { map, startWith } from 'rxjs/operators';
 import { PageEvent } from '@angular/material/paginator';
 
 import { IdentityView } from './modals/filter-modal';
-import { AUTHORS, CATEGORY } from './data/filter-options';
-import { QUOTES } from './data/quote-list';
+import { AppService } from './app.service';
 
 @Component({
   selector: 'app-root',
@@ -32,44 +31,53 @@ export class AppComponent {
 
   filterForm: FormGroup;
 
-  saidByOptions: Array<IdentityView> = AUTHORS;
+  authorOptions: Array<IdentityView> = [];
 
-  categoryOptions: Array<IdentityView> = CATEGORY;
+  tagsOptions: Array<IdentityView> = [];
 
-  quoteList: any = QUOTES;
+  quoteList: any = [];
 
-  filteredSaidByOptions: Observable<any>;
-  filteredCategoryOptions: Observable<any>;
+  filteredAuthorOptions: Observable<any>;
+  filteredTagsOptions: Observable<any>;
 
   toggleFilterDisplay: boolean = true;
+  
+  disableClearBtn: boolean = true;
+
+  disableApplyBtn: boolean = true;
 
   constructor(
-    private _formBuilder: FormBuilder
+    private _formBuilder: FormBuilder,
+    private _appService: AppService
   ) { }
 
   ngOnInit() {
 
     this._createForm();
     this._getFilteredValue();
+    this._handleFilterFormChange();
+    this.getQuotes();
   }
 
   private _createForm(): void {
     this.filterForm = this._formBuilder.group({
-      saidBy: '',
-      category: ''
+      author: '',
+      tags: ''
+    })
+  }
+
+  private _handleFilterFormChange(): void {
+    this.filterForm.valueChanges.subscribe((controlProp) => {
+      let controlValue  = (this.filterForm.get('tags').value || this.filterForm.get('author').value);
+      this.disableApplyBtn = !controlValue;
+      this.disableClearBtn = controlValue;
     })
   }
 
   private _getFilteredValue(): void {
-    this.filteredSaidByOptions = this.filterForm.get('saidBy').valueChanges
-      .pipe(
-        startWith(''),
-        map(value => this._filter(this.saidByOptions, value)));
 
-    this.filteredCategoryOptions = this.filterForm.get('category').valueChanges
-      .pipe(
-        startWith(''),
-        map(value => this._filter(this.categoryOptions, value)));
+    this.getTags();
+    this.getAuthor();
   }
 
   private _filter(filterList, val: string): string[] {
@@ -84,20 +92,66 @@ export class AppComponent {
   }
 
   public applyFilter(): void{
-    let selectedCategory = this.filterForm.get('category').value.toLowerCase();
-    let selectedSaidBy = this.filterForm.get('saidBy').value.toLowerCase();
+
+    let selectedTag = this.filterForm.get('tags').value.toLowerCase();
+    let selectedAuthor = this.filterForm.get('author').value.toLowerCase();
+    
+    this.disableApplyBtn = true;
+    this.disableClearBtn = false;
 
     this.quoteList = this.quoteList.filter((quotes) => {
-      if(selectedSaidBy && selectedCategory) {
-        return quotes.saidBy.toLowerCase() == selectedSaidBy  && quotes.category.includes(selectedCategory);
+      if(selectedAuthor && selectedTag) {
+        return quotes.author.toLowerCase() == selectedAuthor  && quotes.tags.includes(selectedTag);
       } else {
-        return ((selectedSaidBy && quotes.saidBy.toLowerCase() == selectedSaidBy) ||  (selectedCategory && quotes.category.includes(selectedCategory)));
+        return ((selectedAuthor && quotes.author.toLowerCase() == selectedAuthor) ||  (selectedTag && quotes.tags.includes(selectedTag)));
       }
     })
   }
 
+  public clearFilter(): void {
+
+    this.disableClearBtn = true;
+    this.filterForm.get('tags').setValue('');
+    this.filterForm.get('author').setValue('');
+    this.filterForm.updateValueAndValidity();
+    this.getQuotes();
+  }
+
   public toggleFilterPanel(): void {
     this.toggleFilterDisplay = !this.toggleFilterDisplay;
+  }
+
+  public getQuotes(): void {
+    this._appService.getQuotes().subscribe((data) => {
+      this.quoteList = data;
+    })
+  }
+
+  public getTags(): void {
+    this._appService.getTags().subscribe((data) => {
+      this.tagsOptions = data;
+
+      this.filteredTagsOptions = this.filterForm.get('tags').valueChanges
+      .pipe(
+        startWith(''),
+        map(value => this._filter(this.tagsOptions, value)));
+    })
+  }
+
+  public getAuthor(): void {
+
+    this._appService.getAuthor().subscribe((data) => {
+      this.authorOptions = data;
+
+      this.filteredAuthorOptions = this.filterForm.get('author').valueChanges
+      .pipe(
+        startWith(''),
+        map(value => this._filter(this.authorOptions, value)));
+    })
+  }
+
+  public clearFilterOf(filterControl: string): void {
+    this.filterForm.get(filterControl).setValue('');
   }
 
 }

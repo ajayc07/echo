@@ -4,7 +4,7 @@ export const AUTHORS = [
     { name: 'Bharathiyar', value: 'Bharathiyar' },
   ]
 
-export const CATEGORY = [
+export const TAGS = [
     { name: 'Poetry', value: 'Poetry' },
     { name: 'Love', value: 'Love' },
     { name: 'Wisdom', value: 'Wisdom' },
